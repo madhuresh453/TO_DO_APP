@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #4f46e5;
+            margin-top: 40px;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+        #mainContainer {
+            background: #fff;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            border-radius: 18px;
+            padding: 32px 36px 28px 36px;
+            margin-top: 30px;
+            min-width: 350px;
+            max-width: 420px;
+            width: 100%;
+        }
+        #inputSection {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        #taskInput {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1.5px solid #a5b4fc;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.2s;
+        }
+        #taskInput:focus {
+            border: 1.5px solid #6366f1;
+        }
+        #addTaskButton, #removeTask, #clearAllButton, #filterAll, #filterActive, #filterCompleted {
+            background: linear-gradient(90deg, #6366f1 60%, #818cf8 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 22px;
+            font-size: 1.08rem;
+            cursor: pointer;
+            font-weight: 700;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.10);
+            margin-bottom: 2px;
+            margin-right: 4px;
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+        }
+        #addTaskButton {
+            background: linear-gradient(90deg, #22d3ee 60%, #6366f1 100%);
+            box-shadow: 0 2px 8px rgba(34, 211, 238, 0.12);
+        }
+        #addTaskButton:hover {
+            background: linear-gradient(90deg, #0ea5e9 60%, #4338ca 100%);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 16px rgba(34, 211, 238, 0.18);
+        }
+        #removeTask {
+            background: linear-gradient(90deg, #f43f5e 60%, #fb7185 100%);
+            box-shadow: 0 2px 8px rgba(244, 63, 94, 0.10);
+        }
+        #removeTask:hover {
+            background: linear-gradient(90deg, #be123c 60%, #f43f5e 100%);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 16px rgba(244, 63, 94, 0.18);
+        }
+        #clearAllButton {
+            background: linear-gradient(90deg, #f59e42 60%, #fbbf24 100%);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(245, 158, 66, 0.10);
+        }
+        #clearAllButton:hover {
+            background: linear-gradient(90deg, #d97706 60%, #f59e42 100%);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 16px rgba(245, 158, 66, 0.18);
+        }
+        #filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+        #filters button {
+            padding: 8px 18px;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: none;
+            background: #e0e7ff;
+            color: #4f46e5;
+            font-weight: 700;
+            cursor: pointer;
+            margin-right: 4px;
+            margin-bottom: 2px;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 1px 4px rgba(99, 102, 241, 0.07);
+        }
+        #filters button.active, #filters button:hover {
+            background: linear-gradient(90deg, #6366f1 60%, #818cf8 100%);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+        }
+        #taskList {
+            margin-top: 10px;
+            padding: 0;
+            list-style: none;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+        .task-item {
+            background: #eef2ff;
+            margin-bottom: 8px;
+            padding: 10px 14px;
+            border-radius: 7px;
+            font-size: 1rem;
+            color: #3730a3;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.2s, color 0.2s;
+        }
+        .task-item:hover {
+            background: #c7d2fe;
+            color: #312e81;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: #9ca3af !important;
+            background: #f1f5f9 !important;
+        }
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #f43f5e;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: color 0.2s;
+        }
+        .delete-btn:hover {
+            color: #be123c;
+        }
+        #progressContainer {
+            margin-top: 28px;
+        }
+        #progressBar {
+            width: 100%;
+            height: 22px;
+            background-color: #e0e7ff;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1.5px solid #a5b4fc;
+            margin-top: 8px;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.07);
+        }
+        #progressFill {
+            height: 100%;
+            background: linear-gradient(90deg, #4f46e5 60%, #818cf8 100%);
+            width: 0;
+            border-radius: 12px 0 0 12px;
+            transition: width 0.3s;
+        }
+        #progressText {
+            margin-top: 10px;
+            text-align: right;
+            color: #6366f1;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        ::selection {
+            background: #a5b4fc;
+            color: #fff;
+        }
+        @media (max-width: 500px) {
+            #mainContainer {
+                padding: 18px 8px 18px 8px;
+                min-width: unset;
+                max-width: 98vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>To-Do List</h1>
+    <div id="mainContainer">
+        <div id="inputSection">
+            <input type="text" id="taskInput" placeholder="Enter a task" />
+            <button id="addTaskButton">Add</button>
+            <button id="removeTask">Remove</button>
+        </div>
+        <div id="filters">
+            <button id="filterAll" class="active">All</button>
+            <button id="filterActive">Active</button>
+            <button id="filterCompleted">Completed</button>
+        </div>
+        <ul id="taskList"></ul>
+        <div id="progressContainer">
+            <div id="progressBar">
+                <div id="progressFill"></div>
+            </div>
+            <div id="progressText">0 of 0 completed</div>
+        </div>
+        <button id="clearAllButton" style="width:100%;margin-top:18px;">Clear All</button>
+    </div>
+    <script>
+        const addTaskButton = document.getElementById('addTaskButton');
+        const removeTaskButton = document.getElementById('removeTask');
+        const clearAllButton = document.getElementById('clearAllButton');
+        const taskInput = document.getElementById('taskInput');
+        const taskList = document.getElementById('taskList');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const filterAll = document.getElementById('filterAll');
+        const filterActive = document.getElementById('filterActive');
+        const filterCompleted = document.getElementById('filterCompleted');
+
+        let tasks = [];
+
+        function updateProgress() {
+            const totalTasks = tasks.length;
+            const completedTasks = tasks.filter(t => t.completed).length;
+            const percent = totalTasks ? (completedTasks / totalTasks) * 100 : 0;
+            progressFill.style.width = percent + '%';
+            progressText.textContent = `${completedTasks} of ${totalTasks} completed`;
+        }
+
+        function renderTasks(filter = 'all') {
+            taskList.innerHTML = '';
+            let filteredTasks = tasks;
+            if (filter === 'active') filteredTasks = tasks.filter(t => !t.completed);
+            if (filter === 'completed') filteredTasks = tasks.filter(t => t.completed);
+
+            filteredTasks.forEach((task, idx) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'task-item' + (task.completed ? ' completed' : '');
+                listItem.innerHTML = `<span>${task.text}</span>
+                    <button class="delete-btn" title="Delete Task">&times;</button>`;
+                listItem.querySelector('span').onclick = () => {
+                    task.completed = !task.completed;
+                    renderTasks(currentFilter);
+                    updateProgress();
+                };
+                listItem.querySelector('.delete-btn').onclick = () => {
+                    tasks.splice(tasks.indexOf(task), 1);
+                    renderTasks(currentFilter);
+                    updateProgress();
+                };
+                taskList.appendChild(listItem);
+            });
+        }
+
+        function addTask(taskText) {
+            tasks.push({ text: taskText, completed: false });
+            renderTasks(currentFilter);
+            updateProgress();
+        }
+
+        addTaskButton.onclick = () => {
+            const taskText = taskInput.value.trim();
+            if (!taskText) {
+                alert('Please enter a task!');
+                return;
+            }
+            addTask(taskText);
+            taskInput.value = '';
+        };
+
+        taskInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') addTaskButton.click();
+        });
+
+        removeTaskButton.onclick = () => {
+            const taskText = taskInput.value.trim();
+            if (!taskText) {
+                alert('Please enter a task to remove!');
+                return;
+            }
+            const idx = tasks.findIndex(t => t.text === taskText);
+            if (idx !== -1) {
+                tasks.splice(idx, 1);
+                renderTasks(currentFilter);
+                updateProgress();
+                taskInput.value = '';
+            } else {
+                alert('Task not found!');
+            }
+        };
+
+        clearAllButton.onclick = () => {
+            if (tasks.length === 0) return;
+            if (confirm('Are you sure you want to clear all tasks?')) {
+                tasks = [];
+                renderTasks(currentFilter);
+                updateProgress();
+            }
+        };
+
+        // Filtering
+        let currentFilter = 'all';
+        function setFilter(filter) {
+            currentFilter = filter;
+            filterAll.classList.remove('active');
+            filterActive.classList.remove('active');
+            filterCompleted.classList.remove('active');
+            if (filter === 'all') filterAll.classList.add('active');
+            if (filter === 'active') filterActive.classList.add('active');
+            if (filter === 'completed') filterCompleted.classList.add('active');
+            renderTasks(currentFilter);
+        }
+        filterAll.onclick = () => setFilter('all');
+        filterActive.onclick = () => setFilter('active');
+        filterCompleted.onclick = () => setFilter('completed');
+
+        // Save/load to localStorage
+        function saveTasks() {
+            localStorage.setItem('todo-tasks', JSON.stringify(tasks));
+        }
+        function loadTasks() {
+            const saved = localStorage.getItem('todo-tasks');
+            if (saved) tasks = JSON.parse(saved);
+        }
+        window.addEventListener('beforeunload', saveTasks);
+
+        // Initial load
+        loadTasks();
+        renderTasks();
+        updateProgress();
+    </script>
+</body>
+</html>
